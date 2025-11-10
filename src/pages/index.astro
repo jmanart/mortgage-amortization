@@ -1,0 +1,1008 @@
+---
+import '../styles/toast.css';
+---
+
+<html lang="en" id="html-root">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Mortgage Amortization Calculator</title>
+		<meta name="description" content="Calculate and visualize your French mortgage amortization schedule" />
+	</head>
+	<body class="bg-gray-50 min-h-screen">
+		<!-- Collapsible Sidebar Menu -->
+		<div id="sidebar" class="fixed left-0 top-0 h-full bg-white shadow-lg z-50 transition-all duration-300 ease-in-out" style="width: 60px;">
+			<div class="flex flex-col h-full">
+				<!-- Toggle Button -->
+				<button id="sidebar-toggle" class="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+					</svg>
+				</button>
+				
+				<!-- Menu Items -->
+				<nav class="flex-1 flex flex-col py-2">
+					<!-- New Simulation -->
+					<button id="new-simulation-btn" class="sidebar-item group" title="Start New Simulation">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+						</svg>
+						<span class="sidebar-text">New Simulation</span>
+					</button>
+					
+					<!-- Load Simulation -->
+					<button id="load-simulation-menu-btn" class="sidebar-item group" title="Load Simulation">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+						</svg>
+						<span class="sidebar-text">Load Simulation</span>
+					</button>
+					
+					<!-- Amortization Simulations -->
+					<a href="/amortization" class="sidebar-item group" title="Amortization Simulations">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+						</svg>
+						<span class="sidebar-text">Amortization</span>
+					</a>
+					
+					<!-- Compare Simulations -->
+					<a href="/compare" class="sidebar-item group" title="Compare Simulations">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+						</svg>
+						<span class="sidebar-text">Compare</span>
+					</a>
+					
+					<!-- Language -->
+					<button id="language-menu-btn" class="sidebar-item group" title="Change Language">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+						</svg>
+						<span class="sidebar-text">Language</span>
+					</button>
+				</nav>
+			</div>
+		</div>
+		
+		<!-- Main Content Area -->
+		<div id="main-content" class="transition-all duration-300 ease-in-out" style="margin-left: 60px;">
+				<main class="container mx-auto px-4 py-4">
+				<header class="text-left mb-4 h-16 flex items-end justify-between w-full" id="main-header">
+					<div class="flex flex-col sm:flex-row sm:items-end gap-1 sm:gap-2">
+						<h1 class="text-2xl font-bold text-gray-900" data-i18n="app.title">Mortgage Amortization Calculator</h1>
+						<p class="text-sm text-gray-600" data-i18n="app.description">Calculate and visualize your French mortgage amortization schedule</p>
+					</div>
+					
+					<!-- Dynamic Simulation Content (hidden by default) -->
+					<div id="simulation-content" class="mt-4 w-full" style="display: none;">
+						<!-- Top row with name and buttons -->
+						<div class="flex items-center justify-between">
+							<div class="flex-1">
+								<input id="simulation-title-input" type="text" class="w-full text-2xl font-bold text-gray-900 bg-transparent border-none outline-none text-left transition-all duration-200 hover:bg-gray-50 hover:border-b-2 hover:border-gray-300 focus:bg-white focus:border-2 focus:border-blue-500 focus:rounded-md focus:px-2 cursor-text" placeholder="Enter simulation name..." />
+							</div>
+							
+							<!-- Action buttons container -->
+							<div class="flex gap-2 ml-4 flex-shrink-0">
+							<!-- Save Simulation Button (hidden by default) -->
+							<button id="save-simulation-header-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm transition-all duration-200" style="display: none;" data-i18n="simulation.save">
+								<svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+								</svg>
+								Save
+							</button>
+							
+							<!-- Delete Simulation Button (hidden by default) -->
+							<button id="delete-simulation-header-btn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-all duration-200" style="display: none;" title="Delete Current Simulation">
+								<svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+								</svg>
+								Delete
+							</button>
+							</div>
+						</div>
+						
+						<!-- Unsaved indicator below the main row -->
+						<div id="unsaved-indicator" class="text-sm text-orange-600 mt-2" style="display: none;">
+							<span data-i18n="simulation.unsaved">Simulation has not been saved</span>
+						</div>
+					</div>
+				</header>
+			
+			
+			<div class="bg-white rounded-lg shadow-lg p-4 mb-6">
+				<h2 class="text-lg font-semibold text-gray-800 mb-3" data-i18n="mortgage.details">Mortgage Details</h2>
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+					<div>
+						<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="mortgage.loanAmount">Loan Amount (€)</label>
+						<input id="loan-amount" type="number" class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="300000" value="300000" />
+					</div>
+					<div>
+						<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="mortgage.interestRate">Interest Rate (%)</label>
+						<input id="interest-rate" type="number" step="0.01" class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="2.2" value="2.2" />
+					</div>
+					<div>
+						<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="mortgage.loanTerm">Loan Term (years)</label>
+						<input id="loan-term" type="number" class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="25" value="25" />
+					</div>
+					<div>
+						<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="mortgage.startDate">Start Date</label>
+						<input id="start-date" type="date" class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="2025-12-01" />
+					</div>
+				</div>
+			</div>
+
+
+			<div class="bg-white rounded-lg shadow-lg p-4 mb-6">
+				<h2 class="text-lg font-semibold text-gray-800 mb-3" data-i18n="service.payments">Monthly Service Payments</h2>
+				<div id="service-payments-container">
+					<div class="text-sm text-gray-600 mb-3" data-i18n="service.description">Add monthly service payments like life insurance, house insurance, etc.</div>
+					<div class="mt-3">
+						<button id="add-service-payment-btn" class="w-full px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" data-i18n="service.addPayment">
+							+ Add Service Payment
+						</button>
+					</div>
+					<div id="service-payments-list" class="mt-4 space-y-3">
+						<!-- Service payments will be added here dynamically -->
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-white rounded-lg shadow-lg p-6">
+				<h2 class="text-2xl font-semibold text-gray-800 mb-4" data-i18n="schedule.title">Amortization Schedule</h2>
+				<div id="chart-container" class="h-[calc(100vh-200px)] max-h-[800px] min-h-[400px] overflow-hidden">
+					<p class="text-gray-500 text-center" data-i18n="schedule.chartPlaceholder">Chart will appear here after calculation</p>
+				</div>
+			</div>
+			</main>
+		</div>
+
+		<!-- Language Modal -->
+		<div id="language-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+			<div class="flex items-center justify-center min-h-screen p-4">
+				<div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+					<h3 class="text-lg font-semibold text-gray-900 mb-4" data-i18n="common.language">Language</h3>
+					<div class="space-y-3">
+						<button class="language-option w-full text-left px-4 py-2 rounded-md hover:bg-gray-100 transition-colors" data-lang="en">
+							<span class="font-medium">English</span>
+						</button>
+						<button class="language-option w-full text-left px-4 py-2 rounded-md hover:bg-gray-100 transition-colors" data-lang="fr">
+							<span class="font-medium">Français</span>
+						</button>
+						<button class="language-option w-full text-left px-4 py-2 rounded-md hover:bg-gray-100 transition-colors" data-lang="es">
+							<span class="font-medium">Español</span>
+						</button>
+					</div>
+					<div class="mt-6 flex justify-end">
+						<button id="close-language-modal" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Load Simulation Modal -->
+		<div id="load-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+			<div class="flex items-center justify-center min-h-screen p-4">
+				<div class="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
+					<h3 class="text-lg font-semibold text-gray-900 mb-4" data-i18n="simulation.loadSimulation">Load Simulation</h3>
+					<div id="load-simulations-list" class="max-h-96 overflow-y-auto">
+						<!-- Saved simulations will be populated here -->
+					</div>
+					<div class="mt-6 flex justify-end">
+						<button id="close-load-modal" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- Toast Notification Container -->
+		<div id="toast-container" class="fixed top-4 right-4 z-[60] space-y-2">
+			<!-- Toast notifications will be dynamically added here -->
+		</div>
+
+		<style>
+			/* Sidebar Styles */
+			.sidebar-item {
+				@apply flex items-center p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors relative;
+			}
+			
+			.sidebar-text {
+				@apply ml-3 whitespace-nowrap opacity-0 transform translate-x-[-10px] transition-all duration-300 ease-in-out;
+				position: absolute;
+				left: 60px;
+				background: white;
+				padding: 8px 12px;
+				border-radius: 6px;
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+				z-index: 10;
+				white-space: nowrap;
+			}
+			
+			.sidebar-item:hover .sidebar-text {
+				@apply opacity-100 translate-x-0;
+			}
+			
+			/* Expanded sidebar styles */
+			#sidebar.expanded {
+				width: 250px !important;
+			}
+			
+			#sidebar.expanded .sidebar-text {
+				@apply opacity-100 translate-x-0 relative left-0 bg-transparent shadow-none p-0;
+			}
+			
+			#main-content.expanded {
+				margin-left: 250px !important;
+			}
+			
+			/* Language modal styles */
+			.language-option.active {
+				@apply bg-blue-100 text-blue-900;
+			}
+			
+			/* Load simulation modal styles */
+			.simulation-item {
+				@apply flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer;
+			}
+			
+			.simulation-item:hover {
+				@apply border-blue-300 bg-blue-50;
+			}
+			
+			.simulation-item.selected {
+				@apply border-blue-500 bg-blue-100;
+			}
+			
+			.simulation-info {
+				@apply flex-1;
+			}
+			
+			.simulation-name {
+				@apply font-medium text-gray-900;
+			}
+			
+			.simulation-details {
+				@apply text-sm text-gray-500 mt-1;
+			}
+			
+			.simulation-actions {
+				@apply flex gap-2;
+			}
+			
+			/* Toast notification styles moved to global scope in <head> */
+		</style>
+
+		<script src="/i18n/index.js" is:inline></script>
+		<script src="/migration-utility.js" is:inline></script>
+		<script src="/mortgage-simulation.js" is:inline></script>
+		<script src="/amortization-simulation.js" is:inline></script>
+		<script src="/combined-simulation.js" is:inline></script>
+		<script src="/mortgage-calculator-refactored.js" is:inline></script>
+		<script>
+			// Toast notification system
+			function showToast(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration: number = 4000) {
+				const container = document.getElementById('toast-container');
+				const toast = document.createElement('div');
+				const toastId = 'toast-' + Date.now();
+				
+				// Set up toast classes
+				toast.className = `toast ${type}`;
+				toast.id = toastId;
+				
+				// Get icon based on type
+				let iconSvg = '';
+				switch(type) {
+					case 'success':
+						iconSvg = '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+						break;
+					case 'error':
+						iconSvg = '<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+						break;
+					case 'warning':
+						iconSvg = '<svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>';
+						break;
+					default:
+						iconSvg = '<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+				}
+				
+				// Create toast content
+				toast.innerHTML = `
+					<div class="toast-content">
+						<div class="toast-icon">
+							${iconSvg}
+						</div>
+						<div class="toast-message">${message}</div>
+						<button class="toast-close" onclick="hideToast('${toastId}')">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+							</svg>
+						</button>
+					</div>
+				`;
+				
+				// Add to container
+				if (container) container.appendChild(toast);
+				
+				// Trigger animation
+				setTimeout(() => {
+					toast.classList.add('show');
+				}, 10);
+				
+				// Auto-hide after duration
+				if (duration > 0) {
+					setTimeout(() => {
+						hideToast(toastId);
+					}, duration);
+				}
+			}
+			
+			function hideToast(toastId: string) {
+				const toast = document.getElementById(toastId);
+				if (toast) {
+					toast.classList.remove('show');
+					toast.classList.add('hide');
+					setTimeout(() => {
+						toast.remove();
+					}, 300);
+				}
+			}
+			
+			// Make functions globally accessible
+			window.hideToast = hideToast;
+			window.showToast = showToast;
+			
+			// Global state tracking
+			let isSimulationLoaded = false;
+			let hasUnsavedChanges = false;
+			let originalSimulationState: any = null;
+			
+			// Function to check if any field has been modified
+			function checkForChanges(): boolean {
+				if (!originalSimulationState) {
+					return false;
+				}
+				const currentState = getCurrentSimulationState();
+				return JSON.stringify(currentState) !== JSON.stringify(originalSimulationState);
+			}
+			
+			// Function to get current simulation state
+			function getCurrentSimulationState() {
+				const loanAmountEl = document.getElementById('loan-amount') as HTMLInputElement;
+				const interestRateEl = document.getElementById('interest-rate') as HTMLInputElement;
+				const loanTermEl = document.getElementById('loan-term') as HTMLInputElement;
+				const startDateEl = document.getElementById('start-date') as HTMLInputElement;
+				const simulationTitleEl = document.getElementById('simulation-title-input') as HTMLInputElement;
+				
+				return {
+					loanAmount: loanAmountEl?.value || '',
+					interestRate: interestRateEl?.value || '',
+					loanTerm: loanTermEl?.value || '',
+					startDate: startDateEl?.value || '',
+					simulationName: simulationTitleEl?.value || '',
+					servicePayments: window.getServicePaymentsFromUI ? window.getServicePaymentsFromUI() : []
+				};
+			}
+			
+			// Function to update header visibility
+			function updateHeaderVisibility() {
+				const mainHeader = document.getElementById('main-header');
+				const simulationContent = document.getElementById('simulation-content');
+				const originalTitle = mainHeader?.querySelector('h1');
+				const headerContainer = mainHeader?.querySelector('div:first-child') as HTMLElement; // Get the first div (the one with title and description)
+				const deleteButton = document.getElementById('delete-simulation-header-btn');
+				
+				// Show original content when no simulation is loaded and no changes made
+				if (!isSimulationLoaded && !hasUnsavedChanges) {
+					// Restore original content and remove i18n override
+					if (originalTitle) originalTitle.textContent = 'Mortgage Amortization Calculator';
+					if (originalTitle) originalTitle.removeAttribute('data-i18n');
+					if (headerContainer) headerContainer.style.display = 'flex';
+					if (simulationContent) simulationContent.style.display = 'none';
+					// Hide delete button when no simulation is loaded
+					if (deleteButton) {
+						deleteButton.style.display = 'none';
+					}
+				} else {
+					// When simulation is loaded OR when there are unsaved changes, show the editable simulation content
+					if (headerContainer) headerContainer.style.display = 'none';
+					if (simulationContent) simulationContent.style.display = 'block';
+					// Show delete button only when simulation is loaded (not just when there are changes)
+					if (deleteButton) {
+						deleteButton.style.display = isSimulationLoaded ? 'block' : 'none';
+					}
+				}
+			}
+			
+			// Function to update unsaved changes indicator
+			function updateUnsavedIndicator() {
+				const unsavedIndicator = document.getElementById('unsaved-indicator');
+				const saveBtn = document.getElementById('save-simulation-header-btn');
+				
+				if (hasUnsavedChanges) {
+					if (unsavedIndicator) unsavedIndicator.style.display = 'block';
+					if (saveBtn) saveBtn.style.display = 'block';
+				} else {
+					if (unsavedIndicator) unsavedIndicator.style.display = 'none';
+					if (saveBtn) saveBtn.style.display = 'none';
+				}
+			}
+			
+			// Function to mark simulation as loaded
+			function markSimulationAsLoaded() {
+				isSimulationLoaded = true;
+				hasUnsavedChanges = false;
+				originalSimulationState = getCurrentSimulationState();
+				updateHeaderVisibility();
+				updateUnsavedIndicator();
+			}
+			
+			// Make markSimulationAsLoaded globally accessible
+			window.markSimulationAsLoaded = markSimulationAsLoaded;
+			
+			// Function to mark simulation as changed
+			function markSimulationAsChanged() {
+				// Only mark as changed if we haven't initialized the original state yet
+				// This prevents the initial calculation from marking as changed
+				if (!originalSimulationState) {
+					originalSimulationState = getCurrentSimulationState();
+					return; // Don't mark as changed on first call
+				}
+				
+				hasUnsavedChanges = true;
+				updateHeaderVisibility();
+				updateUnsavedIndicator();
+			}
+			
+			// Make markSimulationAsChanged globally accessible
+			window.markSimulationAsChanged = markSimulationAsChanged;
+			
+			// Function to reset to initial state
+			function resetToInitialState() {
+				isSimulationLoaded = false;
+				hasUnsavedChanges = false;
+				originalSimulationState = null;
+				
+				// Clear simulation name field
+				const simulationTitleInput = document.getElementById('simulation-title-input') as HTMLInputElement;
+				if (simulationTitleInput) {
+					simulationTitleInput.value = '';
+				}
+				
+				// Restore original header content
+				const mainHeader = document.getElementById('main-header');
+				const originalTitle = mainHeader?.querySelector('h1');
+				const originalDescription = mainHeader?.querySelector('p');
+				if (originalTitle && originalDescription) {
+					originalTitle.textContent = 'Mortgage Amortization Calculator';
+					originalTitle.setAttribute('data-i18n', 'app.title');
+					originalDescription.textContent = 'Calculate and visualize your French mortgage amortization schedule';
+					originalDescription.setAttribute('data-i18n', 'app.description');
+				}
+				
+				updateHeaderVisibility();
+				updateUnsavedIndicator();
+			}
+
+			// Sidebar functionality
+			document.addEventListener('DOMContentLoaded', function() {
+				const sidebar = document.getElementById('sidebar');
+				const mainContent = document.getElementById('main-content');
+				const toggleBtn = document.getElementById('sidebar-toggle');
+				const languageModal = document.getElementById('language-modal');
+				const loadModal = document.getElementById('load-modal');
+				
+				// Toggle sidebar
+				if (toggleBtn) {
+					toggleBtn.addEventListener('click', function() {
+						if (sidebar) sidebar.classList.toggle('expanded');
+						if (mainContent) mainContent.classList.toggle('expanded');
+					});
+				}
+				
+				// New simulation
+				const newSimulationBtn = document.getElementById('new-simulation-btn');
+				if (newSimulationBtn) {
+					newSimulationBtn.addEventListener('click', function() {
+						// Clear all form fields
+						const loanAmountEl = document.getElementById('loan-amount') as HTMLInputElement;
+						const interestRateEl = document.getElementById('interest-rate') as HTMLInputElement;
+						const loanTermEl = document.getElementById('loan-term') as HTMLInputElement;
+						const startDateEl = document.getElementById('start-date') as HTMLInputElement;
+						
+						if (loanAmountEl) loanAmountEl.value = '300000';
+						if (interestRateEl) interestRateEl.value = '2.2';
+						if (loanTermEl) loanTermEl.value = '25';
+						if (startDateEl) startDateEl.value = '2025-12-01';
+						
+						// Clear simulation title input
+						const simulationTitleInput = document.getElementById('simulation-title-input') as HTMLInputElement;
+						if (simulationTitleInput) {
+							simulationTitleInput.value = '';
+						}
+						
+						// Clear service payments
+						const servicePaymentsList = document.getElementById('service-payments-list');
+						if (servicePaymentsList) servicePaymentsList.innerHTML = '';
+						
+						// Clear chart
+						const chartContainer = document.getElementById('chart-container');
+						if (chartContainer) chartContainer.innerHTML = '<p class="text-gray-500 text-center" data-i18n="schedule.chartPlaceholder">Chart will appear here after calculation</p>';
+						
+						// Reset to initial state
+						resetToInitialState();
+						
+						// Show success message
+						showToast('New simulation started!', 'success');
+					});
+				}
+				
+				// Function to populate load modal with saved simulations
+				function populateLoadModal() {
+					// Fallback function if getSavedSimulations is not available
+					const getSavedSimulationsFallback = () => {
+						const stored = localStorage.getItem('mortgage-calculator-simulations');
+						return stored ? JSON.parse(stored) : [];
+					};
+					
+					const simulations = (typeof window.getSavedSimulations === 'function') 
+						? window.getSavedSimulations() 
+						: getSavedSimulationsFallback();
+					const container = document.getElementById('load-simulations-list');
+					
+					if (!container) return;
+					
+					if (simulations.length === 0) {
+						container.innerHTML = '<p class="text-gray-500 text-center py-4" data-i18n="simulation.noSimulations">No saved simulations found</p>';
+						return;
+					}
+					
+				container.innerHTML = simulations.map((simulation: any) => {
+					// Handle both old and new simulation formats
+					// New format has data nested under mortgageSimulation property
+					const isNewFormat = simulation.mortgageSimulation;
+					const loanAmount = isNewFormat 
+						? (simulation.mortgageSimulation.loanAmount || 0)
+						: (simulation.loanAmount || 0);
+					const interestRate = isNewFormat 
+						? (simulation.mortgageSimulation.interestRate || 0)
+						: (simulation.interestRate || 0);
+					const loanTerm = isNewFormat 
+						? (simulation.mortgageSimulation.loanTerm || 0)
+						: (simulation.loanTerm || 0);
+					const savedAt = simulation.savedAt || new Date().toISOString();
+					
+					return `
+						<div class="simulation-item" data-name="${simulation.name}">
+							<div class="simulation-info">
+								<div class="simulation-name">${simulation.name}</div>
+								<div class="simulation-details">
+									€${loanAmount.toLocaleString()} • ${interestRate}% • ${loanTerm}y • ${new Date(savedAt).toLocaleDateString()}
+								</div>
+							</div>
+							<div class="simulation-actions">
+								<button class="load-simulation-btn px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm" data-name="${simulation.name}">
+									Load
+								</button>
+								<button class="delete-simulation-btn px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm" data-name="${simulation.name}">
+									Delete
+								</button>
+							</div>
+						</div>
+					`;
+				}).join('');
+					
+					// Add event listeners for simulation items
+					container.querySelectorAll('.load-simulation-btn').forEach(btn => {
+						btn.addEventListener('click', function(this: HTMLElement, e: Event) {
+							e.stopPropagation();
+							const simulationName = this.dataset.name;
+							if (loadModal) loadModal.classList.add('hidden');
+							loadSimulation(simulationName || '');
+						});
+					});
+					
+					container.querySelectorAll('.delete-simulation-btn').forEach(btn => {
+						btn.addEventListener('click', function(this: HTMLElement, e: Event) {
+							e.stopPropagation();
+							const simulationName = this.dataset.name;
+							if (confirm(`Are you sure you want to delete "${simulationName}"?`)) {
+								deleteSimulation(simulationName || '');
+								populateLoadModal(); // Refresh the list
+							}
+						});
+					});
+					
+					// Update translations
+					if (window.i18n && window.i18n.updateTranslations) {
+						window.i18n.updateTranslations();
+					}
+				}
+				
+				// Function to delete current simulation
+				function deleteCurrentSimulation(simulationName: string) {
+					// Use the existing deleteSimulation function from mortgage-calculator.js
+					if (typeof window.deleteSimulation === 'function') {
+						window.deleteSimulation(simulationName);
+					} else {
+						// Fallback implementation
+						const simulations = window.getSavedSimulations ? window.getSavedSimulations() : [];
+						const filteredSimulations = simulations.filter((s: any) => s.name !== simulationName);
+						
+						// Save back to localStorage
+						localStorage.setItem('mortgage-calculator-simulations', JSON.stringify(filteredSimulations));
+						
+						showToast(`Simulation "${simulationName}" deleted successfully`, 'success');
+					}
+					
+					// Clear the current simulation and reset to initial state
+					clearCurrentSimulation();
+				}
+				
+				// Function to clear current simulation
+				function clearCurrentSimulation() {
+					// Clear all form fields
+					const loanAmountEl = document.getElementById('loan-amount') as HTMLInputElement;
+					const interestRateEl = document.getElementById('interest-rate') as HTMLInputElement;
+					const loanTermEl = document.getElementById('loan-term') as HTMLInputElement;
+					const startDateEl = document.getElementById('start-date') as HTMLInputElement;
+					
+					if (loanAmountEl) loanAmountEl.value = '300000';
+					if (interestRateEl) interestRateEl.value = '2.2';
+					if (loanTermEl) loanTermEl.value = '25';
+					if (startDateEl) startDateEl.value = '2025-12-01';
+					
+					// Clear simulation title input
+					const simulationTitleInput = document.getElementById('simulation-title-input') as HTMLInputElement;
+					if (simulationTitleInput) {
+						simulationTitleInput.value = '';
+					}
+					
+					// Clear service payments
+					const servicePaymentsList = document.getElementById('service-payments-list');
+					if (servicePaymentsList) servicePaymentsList.innerHTML = '';
+					
+					// Clear chart
+					const chartContainer = document.getElementById('chart-container');
+					if (chartContainer) chartContainer.innerHTML = '<p class="text-gray-500 text-center" data-i18n="schedule.chartPlaceholder">Chart will appear here after calculation</p>';
+					
+					// Reset to initial state
+					resetToInitialState();
+				}
+				
+				// Function to rename a simulation
+				function renameSimulation(oldName: string, newName: string) {
+					const simulations = window.getSavedSimulations ? window.getSavedSimulations() : [];
+					const simulationIndex = simulations.findIndex((s: any) => s.name === oldName);
+					
+					if (simulationIndex === -1) {
+						showToast('Simulation not found', 'error');
+						return;
+					}
+					
+					// Update the simulation name
+					simulations[simulationIndex].name = newName;
+					simulations[simulationIndex].savedAt = new Date().toISOString();
+					
+					// Save back to localStorage
+					localStorage.setItem('mortgage-calculator-simulations', JSON.stringify(simulations));
+					
+					// Update the header input
+					const simulationTitleInput = document.getElementById('simulation-title-input') as HTMLInputElement;
+					if (simulationTitleInput) {
+						simulationTitleInput.value = newName;
+					}
+					
+					// Mark simulation as loaded (saved state)
+					if (typeof window.markSimulationAsLoaded === 'function') {
+						window.markSimulationAsLoaded();
+					}
+					
+					showToast(`Simulation renamed to "${newName}"`, 'success');
+				}
+				
+				// Function to load a simulation by name
+				function loadSimulation(simulationName: string) {
+					// Use the existing loadSimulation function from mortgage-calculator.js
+					if (typeof window.loadSimulation === 'function') {
+						window.loadSimulation(simulationName);
+					} else {
+						// Fallback implementation
+						const simulations = window.getSavedSimulations ? window.getSavedSimulations() : [];
+						const simulation = simulations.find((s: any) => s.name === simulationName);
+						
+						if (!simulation) {
+							showToast('Simulation not found!', 'error');
+							return;
+						}
+						
+						// Load basic mortgage details
+						const loanAmountEl = document.getElementById('loan-amount') as HTMLInputElement;
+						const interestRateEl = document.getElementById('interest-rate') as HTMLInputElement;
+						const loanTermEl = document.getElementById('loan-term') as HTMLInputElement;
+						const startDateEl = document.getElementById('start-date') as HTMLInputElement;
+						
+						if (loanAmountEl) loanAmountEl.value = simulation.loanAmount || '';
+						if (interestRateEl) interestRateEl.value = simulation.interestRate || '';
+						if (loanTermEl) loanTermEl.value = simulation.loanTerm || '';
+						if (startDateEl) startDateEl.value = simulation.startDate || '';
+						
+						// Update header input
+						const simulationTitleInput = document.getElementById('simulation-title-input') as HTMLInputElement;
+						if (simulationTitleInput) {
+							simulationTitleInput.value = simulation.name;
+						}
+						
+						// Load payments using the global arrays and update functions
+						if (typeof window.amortizationPayments !== 'undefined') {
+							window.amortizationPayments = simulation.amortizationPayments || [];
+							if (typeof window.updateAmortizationPaymentsDisplay === 'function') {
+								window.updateAmortizationPaymentsDisplay();
+							}
+						}
+						
+						if (typeof window.periodicPayments !== 'undefined') {
+							window.periodicPayments = simulation.periodicPayments || [];
+							if (typeof window.updatePeriodicPaymentsDisplay === 'function') {
+								window.updatePeriodicPaymentsDisplay();
+							}
+						}
+						
+						if (typeof window.servicePayments !== 'undefined') {
+							window.servicePayments = simulation.servicePayments || [];
+							if (typeof window.updateServicePaymentsDisplay === 'function') {
+								window.updateServicePaymentsDisplay();
+							}
+						}
+						
+						// Mark simulation as loaded
+						markSimulationAsLoaded();
+						
+						// Trigger calculation
+						if (typeof window.calculateAndDisplay === 'function') {
+							window.calculateAndDisplay();
+						}
+						
+						showToast('Simulation loaded successfully!', 'success');
+					}
+				}
+				
+				// Load simulation (show modal with list)
+				const loadSimulationMenuBtn = document.getElementById('load-simulation-menu-btn');
+				if (loadSimulationMenuBtn) {
+					loadSimulationMenuBtn.addEventListener('click', function() {
+						populateLoadModal();
+						if (loadModal) loadModal.classList.remove('hidden');
+					});
+				}
+				
+				// Inline rename simulation functionality
+				const simulationTitleInput = document.getElementById('simulation-title-input') as HTMLInputElement;
+				let originalName = '';
+				
+				if (simulationTitleInput) {
+					// Handle focus - store original name
+					simulationTitleInput.addEventListener('focus', function() {
+						originalName = this.value.trim();
+					});
+					
+					// Handle blur - save if changed
+					simulationTitleInput.addEventListener('blur', function() {
+						const newName = this.value.trim();
+						if (newName && newName !== originalName) {
+							handleSimulationRename(originalName, newName);
+						}
+					});
+					
+					// Handle Enter key - save and blur
+					simulationTitleInput.addEventListener('keydown', function(e: KeyboardEvent) {
+						if (e.key === 'Enter') {
+							e.preventDefault();
+							this.blur(); // This will trigger the blur event and save
+						} else if (e.key === 'Escape') {
+							e.preventDefault();
+							this.value = originalName; // Restore original name
+							this.blur();
+						}
+					});
+				}
+				
+				// Delete simulation from header
+				const deleteSimulationHeaderBtn = document.getElementById('delete-simulation-header-btn');
+				if (deleteSimulationHeaderBtn) {
+					deleteSimulationHeaderBtn.addEventListener('click', function() {
+						const simulationTitleInput = document.getElementById('simulation-title-input') as HTMLInputElement;
+						const currentSimulationName = simulationTitleInput?.value.trim() || '';
+						if (!currentSimulationName) {
+							showToast('No simulation to delete. Please load or create a simulation first.', 'warning');
+							return;
+						}
+						
+						// Check if simulation exists in saved simulations
+						const simulations = window.getSavedSimulations ? window.getSavedSimulations() : [];
+						const simulationExists = simulations.find((s: any) => s.name === currentSimulationName);
+						
+						if (!simulationExists) {
+							showToast('Simulation not found in saved simulations', 'error');
+							return;
+						}
+						
+						// Confirm deletion
+						if (confirm(`Are you sure you want to delete "${currentSimulationName}"? This action cannot be undone.`)) {
+							deleteCurrentSimulation(currentSimulationName);
+						}
+					});
+				}
+				
+				// Language menu
+				const languageMenuBtn = document.getElementById('language-menu-btn');
+				if (languageMenuBtn) {
+					languageMenuBtn.addEventListener('click', function() {
+						// Re-setup language options in case they weren't found initially
+						setupLanguageOptions();
+						
+						// Update active language in modal
+						const currentLang = window.i18n ? window.i18n.getCurrentLanguage() : 'en';
+						
+						document.querySelectorAll('.language-option').forEach(option => {
+							option.classList.remove('active');
+							if ((option as HTMLElement).dataset.lang === currentLang) {
+								option.classList.add('active');
+							}
+						});
+						if (languageModal) languageModal.classList.remove('hidden');
+					});
+				}
+				
+				// Close modals
+				const closeLanguageModalBtn = document.getElementById('close-language-modal');
+				if (closeLanguageModalBtn) {
+					closeLanguageModalBtn.addEventListener('click', function() {
+						if (languageModal) languageModal.classList.add('hidden');
+					});
+				}
+				
+				const closeLoadModalBtn = document.getElementById('close-load-modal');
+				if (closeLoadModalBtn) {
+					closeLoadModalBtn.addEventListener('click', function() {
+						if (loadModal) loadModal.classList.add('hidden');
+					});
+				}
+				
+				// Cancel rename functionality removed - handled inline in simulation title input
+				
+				// Language selection - set up event listeners when modal opens
+				function setupLanguageOptions() {
+					const languageOptions = document.querySelectorAll('.language-option');
+					
+					languageOptions.forEach((option) => {
+						// Remove any existing click listeners to prevent duplicates
+						option.replaceWith(option.cloneNode(true));
+					});
+					
+					// Re-query after cloning to get fresh elements
+					const freshLanguageOptions = document.querySelectorAll('.language-option');
+					
+					freshLanguageOptions.forEach((option) => {
+						option.addEventListener('click', function(this: HTMLElement, e: Event) {
+							const lang = this.dataset.lang;
+							
+							// Change language directly using i18n system
+							if (window.i18n && lang) {
+								window.i18n.changeLanguage(lang);
+							}
+							if (languageModal) languageModal.classList.add('hidden');
+						});
+					});
+				}
+				
+				// Set up language options initially
+				setupLanguageOptions();
+				
+				// Handle simulation rename with validation
+				function handleSimulationRename(oldName: string, newName: string) {
+					if (!newName) {
+						showToast('Please enter a simulation name', 'warning');
+						if (simulationTitleInput) simulationTitleInput.value = oldName; // Restore original
+						return;
+					}
+					
+					if (newName === oldName) {
+						return; // No change needed
+					}
+					
+					// Check if name already exists
+					const simulations = window.getSavedSimulations ? window.getSavedSimulations() : [];
+					const existingSimulation = simulations.find((s: any) => s.name === newName);
+					if (existingSimulation) {
+						showToast('A simulation with this name already exists', 'error');
+						if (simulationTitleInput) simulationTitleInput.value = oldName; // Restore original
+						return;
+					}
+					
+					// Rename the simulation
+					renameSimulation(oldName, newName);
+				}
+				
+				// Close modals on outside click
+				if (languageModal) {
+					languageModal.addEventListener('click', function(e: Event) {
+						if (e.target === languageModal) {
+							languageModal.classList.add('hidden');
+						}
+					});
+				}
+				
+				if (loadModal) {
+					loadModal.addEventListener('click', function(e: Event) {
+						if (e.target === loadModal) {
+							loadModal.classList.add('hidden');
+						}
+					});
+				}
+				
+				
+				// Dynamic header functionality
+				const saveSimulationHeaderBtn = document.getElementById('save-simulation-header-btn');
+				
+				// Track changes in simulation title input
+				if (simulationTitleInput) {
+					simulationTitleInput.addEventListener('input', function() {
+						markSimulationAsChanged();
+						updateHeaderVisibility(); // Update header immediately when typing
+					});
+				}
+				
+				// Save simulation from header
+				if (saveSimulationHeaderBtn) {
+					saveSimulationHeaderBtn.addEventListener('click', function() {
+						const simulationName = simulationTitleInput?.value.trim() || '';
+						if (simulationName) {
+							// Use the existing saveSimulation function from mortgage-calculator.js
+							if (typeof window.saveSimulation === 'function') {
+								window.saveSimulation(simulationName);
+							} else {
+								// Fallback to the local saveSimulation function
+								// Note: saveSimulation function would need to be defined
+								console.warn('saveSimulation function not available');
+							}
+							markSimulationAsLoaded();
+						}
+					});
+				}
+				
+				// Track changes in all form fields
+				const formFields = [
+					'loan-amount', 'interest-rate', 'loan-term', 'start-date'
+				];
+				
+				formFields.forEach(fieldId => {
+					const field = document.getElementById(fieldId);
+					if (field) {
+						field.addEventListener('input', markSimulationAsChanged);
+						field.addEventListener('change', markSimulationAsChanged);
+					}
+				});
+				
+			// Initialize header visibility
+			updateHeaderVisibility();
+			
+			// Check for simulation to load from URL parameter
+			const urlParams = new URLSearchParams(window.location.search);
+			const simulationToLoad = urlParams.get('load');
+			if (simulationToLoad) {
+				// Load the simulation
+				loadSimulation(decodeURIComponent(simulationToLoad));
+				// Clean up the URL
+				window.history.replaceState({}, document.title, window.location.pathname);
+			}
+		});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,52 @@
+{
+  "name": "mortgage-amortization",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "This project is a calculator and viewer of Mortgage and Amortizations for the french system.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:user-journey": "playwright test tests/user-journey-*.spec.ts",
+    "test:user-journey:ui": "playwright test tests/user-journey-*.spec.ts --ui",
+    "test:journey:basic": "playwright test tests/user-journey-basic-comparison.spec.ts",
+    "test:journey:services": "playwright test tests/user-journey-service-costs.spec.ts",
+    "test:journey:rates": "playwright test tests/user-journey-interest-rate-variations.spec.ts",
+    "test:journey:repayment": "playwright test tests/user-journey-early-repayment.spec.ts",
+    "test:journey:real-world": "playwright test tests/user-journey-real-world-offers.spec.ts",
+    "test:journey:edge-cases": "playwright test tests/user-journey-edge-cases.spec.ts",
+    "test:journey:i18n": "playwright test tests/user-journey-multi-language.spec.ts",
+    "test:journey:mobile": "playwright test tests/user-journey-mobile-responsive.spec.ts",
+    "test:journey:complete": "playwright test tests/user-journey-complete-flow.spec.ts",
+    "test:journey:errors": "playwright test tests/user-journey-error-handling.spec.ts",
+    "test:journey:p0": "playwright test tests/user-journey-basic-comparison.spec.ts tests/user-journey-service-costs.spec.ts tests/user-journey-real-world-offers.spec.ts",
+    "test:journey:p1": "playwright test tests/user-journey-interest-rate-variations.spec.ts tests/user-journey-early-repayment.spec.ts tests/user-journey-edge-cases.spec.ts",
+    "automate": "tsx scripts/browser-automation-example.ts",
+    "verify": "tsx scripts/verify-setup.ts"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/tailwind": "^6.0.2",
+    "@types/d3": "^7.4.3",
+    "astro": "^5.14.1",
+    "d3": "^7.9.0",
+    "tailwindcss": "^3.4.18",
+    "typescript": "^5.9.3",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^24.7.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6"
+  }
+}

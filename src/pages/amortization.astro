@@ -1,0 +1,412 @@
+---
+import '../styles/toast.css';
+---
+
+<html lang="en" id="html-root">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Amortization Simulation - Mortgage Calculator</title>
+		<meta name="description" content="Create and manage amortization payment simulations" />
+	</head>
+	<body class="bg-gray-50 min-h-screen">
+		<!-- Collapsible Sidebar Menu -->
+		<div id="sidebar" class="fixed left-0 top-0 h-full bg-white shadow-lg z-50 transition-all duration-300 ease-in-out" style="width: 60px;">
+			<div class="flex flex-col h-full">
+				<!-- Toggle Button -->
+				<button id="sidebar-toggle" class="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+					</svg>
+				</button>
+				
+				<!-- Menu Items -->
+				<nav class="flex-1 flex flex-col py-2">
+					<!-- Back to Mortgage -->
+					<a href="/" class="sidebar-item group" title="Back to Mortgage Calculator">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+						</svg>
+						<span class="sidebar-text">Back to Mortgage</span>
+					</a>
+					
+					<!-- New Amortization Simulation -->
+					<button id="new-amortization-btn" class="sidebar-item group" title="Start New Amortization Simulation">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+						</svg>
+						<span class="sidebar-text">New Simulation</span>
+					</button>
+					
+					<!-- Load Amortization Simulation -->
+					<button id="load-amortization-menu-btn" class="sidebar-item group" title="Load Amortization Simulation">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+						</svg>
+						<span class="sidebar-text">Load Simulation</span>
+					</button>
+					
+					<!-- Compare Simulations -->
+					<a href="/compare" class="sidebar-item group" title="Compare Simulations">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+						</svg>
+						<span class="sidebar-text">Compare</span>
+					</a>
+					
+					<!-- Language -->
+					<button id="language-menu-btn" class="sidebar-item group" title="Change Language">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+						</svg>
+						<span class="sidebar-text">Language</span>
+					</button>
+				</nav>
+			</div>
+		</div>
+		
+		<!-- Main Content Area -->
+		<div id="main-content" class="transition-all duration-300 ease-in-out" style="margin-left: 60px;">
+			<main class="container mx-auto px-4 py-4">
+				<header class="text-left mb-4 h-16 flex items-end justify-between w-full" id="main-header">
+					<div class="flex flex-col sm:flex-row sm:items-end gap-1 sm:gap-2">
+						<h1 class="text-2xl font-bold text-gray-900" data-i18n="amortization.title">Amortization Simulation</h1>
+						<p class="text-sm text-gray-600" data-i18n="amortization.description">Create and manage amortization payment simulations</p>
+					</div>
+					
+					<!-- Dynamic Simulation Content (hidden by default) -->
+					<div id="simulation-content" class="mt-4 w-full" style="display: none;">
+						<!-- Top row with name and buttons -->
+						<div class="flex items-center justify-between">
+							<div class="flex-1">
+								<input id="simulation-title-input" type="text" class="w-full text-2xl font-bold text-gray-900 bg-transparent border-none outline-none text-left transition-all duration-200 hover:bg-gray-50 hover:border-b-2 hover:border-gray-300 focus:bg-white focus:border-2 focus:border-blue-500 focus:rounded-md focus:px-2 cursor-text" placeholder="Enter simulation name..." />
+							</div>
+							
+							<!-- Action buttons container -->
+							<div class="flex gap-2 ml-4 flex-shrink-0">
+								<!-- Download Spreadsheet Button (hidden by default) -->
+								<button id="download-spreadsheet-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all duration-200" style="display: none;" title="Download as Spreadsheet">
+									<svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+									</svg>
+									Download
+								</button>
+								
+								<!-- Save Simulation Button (hidden by default) -->
+								<button id="save-simulation-header-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm transition-all duration-200" style="display: none;" data-i18n="simulation.save">
+									<svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+									</svg>
+									Save
+								</button>
+								
+								<!-- Delete Simulation Button (hidden by default) -->
+								<button id="delete-simulation-header-btn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-all duration-200" style="display: none;" title="Delete Current Simulation">
+									<svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+									</svg>
+									Delete
+								</button>
+							</div>
+						</div>
+						
+						<!-- Unsaved indicator below the main row -->
+						<div id="unsaved-indicator" class="text-sm text-orange-600 mt-2" style="display: none;">
+							<span data-i18n="simulation.unsaved">Simulation has not been saved</span>
+						</div>
+					</div>
+				</header>
+
+				<!-- One-off Amortization Payments -->
+				<div class="bg-white rounded-lg shadow-lg p-4 mb-6">
+					<h2 class="text-lg font-semibold text-gray-800 mb-3" data-i18n="amortization.oneOffPayments">One-off Amortization Payments</h2>
+					<div id="amortization-payments-container">
+						<div class="text-sm text-gray-600 mb-3" data-i18n="amortization.oneOffDescription">Add one-time extra payments to reduce your principal balance</div>
+						<div id="amortization-payments-list" class="space-y-3 mb-4">
+							<!-- Amortization payments will be added here dynamically -->
+						</div>
+						<button id="add-amortization-btn" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm" data-i18n="amortization.addPayment">
+							+ Add One-off Payment
+						</button>
+					</div>
+				</div>
+
+				<!-- Periodic Amortization Payments -->
+				<div class="bg-white rounded-lg shadow-lg p-4 mb-6">
+					<h2 class="text-lg font-semibold text-gray-800 mb-3" data-i18n="amortization.periodicPayments">Periodic Amortization Payments</h2>
+					<div id="periodic-payments-container">
+						<div class="text-sm text-gray-600 mb-3" data-i18n="amortization.periodicDescription">Set up recurring amortization payments at regular intervals</div>
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="amortization.amount">Amount (€)</label>
+								<input id="periodic-amount" type="number" class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="500" value="" />
+							</div>
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="amortization.interval">Interval (months)</label>
+								<input id="periodic-interval" type="number" class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="6" value="" min="1" />
+							</div>
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="amortization.startPeriod">Start Period</label>
+								<input id="periodic-start" type="number" class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="12" value="" min="1" />
+							</div>
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="amortization.endPeriod">End Period</label>
+								<input id="periodic-end" type="number" class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="300" value="" min="1" />
+							</div>
+							<div>
+								<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="amortization.penalty">Penalty (%)</label>
+								<input id="periodic-penalty" type="number" step="0.01" class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.5" value="0.5" />
+							</div>
+						</div>
+						<div class="mt-3 flex gap-2">
+							<button id="add-periodic-payment-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" data-i18n="amortization.addPeriodicPayment">
+								+ Add Periodic Payment
+							</button>
+							<button id="clear-periodic-payments-btn" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm" data-i18n="amortization.clearAll">
+								Clear All
+							</button>
+						</div>
+						<div id="periodic-payments-list" class="mt-4 space-y-2">
+							<!-- Periodic payments will be displayed here -->
+						</div>
+					</div>
+				</div>
+
+				<!-- Simulation Summary -->
+				<div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+					<h2 class="text-2xl font-semibold text-gray-800 mb-4" data-i18n="amortization.summary">Simulation Summary</h2>
+					<div id="summary-container" class="text-gray-500 text-center">
+						<p data-i18n="amortization.summaryPlaceholder">Add amortization payments to see simulation summary</p>
+					</div>
+				</div>
+
+				<!-- Comparison Table: Impact on Mortgage Simulations -->
+				<div id="comparison-section" class="bg-white rounded-lg shadow-lg p-6" style="display: none;">
+					<h2 class="text-2xl font-semibold text-gray-800 mb-4" data-i18n="amortization.comparisonTitle">Impact on Mortgage Simulations</h2>
+					<div class="overflow-x-auto">
+						<table class="w-full">
+							<thead>
+								<tr class="border-b border-gray-200">
+									<th class="text-left py-3 px-4 font-medium text-gray-700" data-i18n="compare.name">Name</th>
+									<th class="text-right py-3 px-4 font-medium text-gray-700" data-i18n="amortization.loanAmount">Loan Amount</th>
+									<th class="text-right py-3 px-4 font-medium text-gray-700" data-i18n="amortization.loanTerm">Loan Term</th>
+									<th class="text-right py-3 px-4 font-medium text-gray-700" data-i18n="amortization.baselineTotal">Baseline Total</th>
+									<th class="text-right py-3 px-4 font-medium text-gray-700" data-i18n="amortization.withAmortization">With Amortization</th>
+									<th class="text-right py-3 px-4 font-medium text-gray-700" data-i18n="amortization.savings">Savings</th>
+									<th class="text-right py-3 px-4 font-medium text-gray-700" data-i18n="amortization.monthsSaved">Months Saved</th>
+								</tr>
+							</thead>
+							<tbody id="comparison-table-body">
+								<!-- Comparison rows will be added here dynamically -->
+							</tbody>
+						</table>
+					</div>
+					<div id="no-mortgage-simulations-message" class="text-center py-8 text-gray-500" style="display: none;">
+						<svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+						</svg>
+						<p data-i18n="amortization.noMortgageSimulations">No saved mortgage simulations found</p>
+						<a href="/" class="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" data-i18n="amortization.createMortgage">Create a mortgage simulation</a>
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<!-- Language Modal -->
+		<div id="language-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+			<div class="flex items-center justify-center min-h-screen p-4">
+				<div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+					<h3 class="text-lg font-semibold text-gray-900 mb-4" data-i18n="common.language">Language</h3>
+					<div class="space-y-3">
+						<button class="language-option w-full text-left px-4 py-2 rounded-md hover:bg-gray-100 transition-colors" data-lang="en">
+							<span class="font-medium">English</span>
+						</button>
+						<button class="language-option w-full text-left px-4 py-2 rounded-md hover:bg-gray-100 transition-colors" data-lang="fr">
+							<span class="font-medium">Français</span>
+						</button>
+						<button class="language-option w-full text-left px-4 py-2 rounded-md hover:bg-gray-100 transition-colors" data-lang="es">
+							<span class="font-medium">Español</span>
+						</button>
+					</div>
+					<div class="mt-6 flex justify-end">
+						<button id="close-language-modal" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Load Amortization Simulation Modal -->
+		<div id="load-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+			<div class="flex items-center justify-center min-h-screen p-4">
+				<div class="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
+					<h3 class="text-lg font-semibold text-gray-900 mb-4" data-i18n="amortization.loadSimulation">Load Amortization Simulation</h3>
+					<div id="load-simulations-list" class="max-h-96 overflow-y-auto">
+						<!-- Saved simulations will be populated here -->
+					</div>
+					<div class="mt-6 flex justify-end">
+						<button id="close-load-modal" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Toast Notification Container -->
+		<div id="toast-container" class="fixed top-4 right-4 z-[60] space-y-2">
+			<!-- Toast notifications will be dynamically added here -->
+		</div>
+
+		<style>
+			/* Sidebar Styles */
+			.sidebar-item {
+				@apply flex items-center p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors relative;
+			}
+			
+			.sidebar-text {
+				@apply ml-3 whitespace-nowrap opacity-0 transform translate-x-[-10px] transition-all duration-300 ease-in-out;
+				position: absolute;
+				left: 60px;
+				background: white;
+				padding: 8px 12px;
+				border-radius: 6px;
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+				z-index: 10;
+				white-space: nowrap;
+			}
+			
+			.sidebar-item:hover .sidebar-text {
+				@apply opacity-100 translate-x-0;
+			}
+			
+			/* Expanded sidebar styles */
+			#sidebar.expanded {
+				width: 250px !important;
+			}
+			
+			#sidebar.expanded .sidebar-text {
+				@apply opacity-100 translate-x-0 relative left-0 bg-transparent shadow-none p-0;
+			}
+			
+			#main-content.expanded {
+				margin-left: 250px !important;
+			}
+			
+			/* Language modal styles */
+			.language-option.active {
+				@apply bg-blue-100 text-blue-900;
+			}
+			
+			/* Load simulation modal styles */
+			.simulation-item {
+				@apply flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer;
+			}
+			
+			.simulation-item:hover {
+				@apply border-blue-300 bg-blue-50;
+			}
+			
+			.simulation-item.selected {
+				@apply border-blue-500 bg-blue-100;
+			}
+			
+			.simulation-info {
+				@apply flex-1;
+			}
+			
+			.simulation-name {
+				@apply font-medium text-gray-900;
+			}
+			
+			.simulation-details {
+				@apply text-sm text-gray-500 mt-1;
+			}
+			
+			.simulation-actions {
+				@apply flex gap-2;
+			}
+		</style>
+
+		<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+		<script src="/i18n/index.js" is:inline></script>
+		<script src="/amortization-simulation.js" is:inline></script>
+		<script src="/amortization-calculator.js" is:inline></script>
+		<script>
+		// Toast notification system
+		function showToast(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration: number = 4000) {
+				const container = document.getElementById('toast-container');
+				const toast = document.createElement('div');
+				const toastId = 'toast-' + Date.now();
+				
+				// Set up toast classes
+				toast.className = `toast ${type}`;
+				toast.id = toastId;
+				
+				// Get icon based on type
+				let iconSvg = '';
+				switch(type) {
+					case 'success':
+						iconSvg = '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+						break;
+					case 'error':
+						iconSvg = '<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+						break;
+					case 'warning':
+						iconSvg = '<svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>';
+						break;
+					default:
+						iconSvg = '<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+				}
+				
+				// Create toast content
+				toast.innerHTML = `
+					<div class="toast-content">
+						<div class="toast-icon">
+							${iconSvg}
+						</div>
+						<div class="toast-message">${message}</div>
+						<button class="toast-close" onclick="hideToast('${toastId}')">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+							</svg>
+						</button>
+					</div>
+				`;
+				
+			// Add to container
+			if (container) container.appendChild(toast);
+				
+				// Trigger animation
+				setTimeout(() => {
+					toast.classList.add('show');
+				}, 10);
+				
+				// Auto-hide after duration
+				if (duration > 0) {
+					setTimeout(() => {
+						hideToast(toastId);
+					}, duration);
+				}
+			}
+			
+			function hideToast(toastId: string) {
+				const toast = document.getElementById(toastId);
+				if (toast) {
+					toast.classList.remove('show');
+					toast.classList.add('hide');
+					setTimeout(() => {
+						toast.remove();
+					}, 300);
+				}
+			}
+			
+			// Make functions globally accessible
+			window.hideToast = hideToast;
+			window.showToast = showToast;
+		</script>
+	</body>
+</html>
