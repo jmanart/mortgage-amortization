@@ -3,10 +3,30 @@ let currentLanguage = 'en';
 let translations = {};
 let isInitialized = false;
 
+// Get base URL from script tag or current location
+function getBaseUrl() {
+  // Try to get base URL from the script tag that loaded this file
+  const scripts = document.getElementsByTagName('script');
+  for (let script of scripts) {
+    if (script.src && script.src.includes('i18n/index.js')) {
+      const url = new URL(script.src);
+      return url.pathname.replace('/i18n/index.js', '');
+    }
+  }
+  // Fallback: detect base URL from current path
+  // If path starts with /mortgage-amortization, use that as base
+  const path = window.location.pathname;
+  if (path.startsWith('/mortgage-amortization')) {
+    return '/mortgage-amortization';
+  }
+  return '';
+}
+
 // Load translations for a specific language
 async function loadTranslations(lang) {
   try {
-    const response = await fetch(`/i18n/${lang}.json`);
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/i18n/${lang}.json`);
     if (!response.ok) {
       throw new Error(`Failed to load translations for ${lang}`);
     }

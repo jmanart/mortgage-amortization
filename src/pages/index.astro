@@ -5,7 +5,7 @@ import '../styles/toast.css';
 <html lang="en" id="html-root">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Mortgage Amortization Calculator</title>
@@ -41,7 +41,7 @@ import '../styles/toast.css';
 					</button>
 					
 					<!-- Amortization Simulations -->
-					<a href="/amortization" class="sidebar-item group" title="Amortization Simulations">
+					<a href={`${import.meta.env.BASE_URL}amortization`} class="sidebar-item group" title="Amortization Simulations">
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
 						</svg>
@@ -49,7 +49,7 @@ import '../styles/toast.css';
 					</a>
 					
 					<!-- Compare Simulations -->
-					<a href="/compare" class="sidebar-item group" title="Compare Simulations">
+					<a href={`${import.meta.env.BASE_URL}compare`} class="sidebar-item group" title="Compare Simulations">
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
 						</svg>
@@ -279,12 +279,12 @@ import '../styles/toast.css';
 			/* Toast notification styles moved to global scope in <head> */
 		</style>
 
-		<script src="/i18n/index.js" is:inline></script>
-		<script src="/migration-utility.js" is:inline></script>
-		<script src="/mortgage-simulation.js" is:inline></script>
-		<script src="/amortization-simulation.js" is:inline></script>
-		<script src="/combined-simulation.js" is:inline></script>
-		<script src="/mortgage-calculator-refactored.js" is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}i18n/index.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}migration-utility.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}mortgage-simulation.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}amortization-simulation.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}combined-simulation.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}mortgage-calculator-refactored.js`} is:inline></script>
 		<script>
 			// Toast notification system
 			function showToast(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration: number = 4000) {

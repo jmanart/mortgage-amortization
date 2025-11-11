@@ -1,0 +1,47 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Chrome with Dev Server",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4321",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile",
+      "runtimeArgs": [
+        "--disable-extensions"
+      ],
+      "preLaunchTask": "npm: dev"
+    },
+    {
+      "name": "Attach to Chrome",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "urlFilter": "http://localhost:4321/*"
+    },
+    {
+      "name": "Launch Chrome (Manual Server)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4321",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Launch Edge with Dev Server",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:4321",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile",
+      "preLaunchTask": "npm: dev"
+    }
+  ],
+  "compounds": []
+}

@@ -5,7 +5,7 @@ import '../styles/toast.css';
 <html lang="en" id="html-root">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Amortization Simulation - Mortgage Calculator</title>
@@ -25,7 +25,7 @@ import '../styles/toast.css';
 				<!-- Menu Items -->
 				<nav class="flex-1 flex flex-col py-2">
 					<!-- Back to Mortgage -->
-					<a href="/" class="sidebar-item group" title="Back to Mortgage Calculator">
+					<a href={`${import.meta.env.BASE_URL}`} class="sidebar-item group" title="Back to Mortgage Calculator">
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
 						</svg>
@@ -49,7 +49,7 @@ import '../styles/toast.css';
 					</button>
 					
 					<!-- Compare Simulations -->
-					<a href="/compare" class="sidebar-item group" title="Compare Simulations">
+					<a href={`${import.meta.env.BASE_URL}compare`} class="sidebar-item group" title="Compare Simulations">
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
 						</svg>
@@ -208,7 +208,7 @@ import '../styles/toast.css';
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
 						</svg>
 						<p data-i18n="amortization.noMortgageSimulations">No saved mortgage simulations found</p>
-						<a href="/" class="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" data-i18n="amortization.createMortgage">Create a mortgage simulation</a>
+						<a href={`${import.meta.env.BASE_URL}`} class="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" data-i18n="amortization.createMortgage">Create a mortgage simulation</a>
 					</div>
 				</div>
 			</main>
@@ -332,9 +332,9 @@ import '../styles/toast.css';
 		</style>
 
 		<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-		<script src="/i18n/index.js" is:inline></script>
-		<script src="/amortization-simulation.js" is:inline></script>
-		<script src="/amortization-calculator.js" is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}i18n/index.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}amortization-simulation.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}amortization-calculator.js`} is:inline></script>
 		<script>
 		// Toast notification system
 		function showToast(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration: number = 4000) {
