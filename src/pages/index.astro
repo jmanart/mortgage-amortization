@@ -279,12 +279,12 @@ import '../styles/toast.css';
 			/* Toast notification styles moved to global scope in <head> */
 		</style>
 
-		<script src={`${import.meta.env.BASE_URL}i18n/index.js`} is:inline></script>
-		<script src={`${import.meta.env.BASE_URL}migration-utility.js`} is:inline></script>
-		<script src={`${import.meta.env.BASE_URL}mortgage-simulation.js`} is:inline></script>
-		<script src={`${import.meta.env.BASE_URL}amortization-simulation.js`} is:inline></script>
-		<script src={`${import.meta.env.BASE_URL}combined-simulation.js`} is:inline></script>
-		<script src={`${import.meta.env.BASE_URL}mortgage-calculator-refactored.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}/i18n/index.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}/migration-utility.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}/mortgage-simulation.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}/amortization-simulation.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}/combined-simulation.js`} is:inline></script>
+		<script src={`${import.meta.env.BASE_URL}/mortgage-calculator-refactored.js`} is:inline></script>
 		<script>
 			// Toast notification system
 			function showToast(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration: number = 4000) {
